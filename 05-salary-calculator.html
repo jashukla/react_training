@@ -44,9 +44,6 @@
         onTaxChange = (evt) => {
           this.setState({ tax: evt.target.value });
         };
-        onUserNameChange = (evt) => {
-          this.setState({ userName: evt.target.value });
-        };
 
 
         calculate = () => {
@@ -91,15 +88,12 @@
                       <td>{hra}</td>
                       <td>{da}</td>
                       <td>{tax}</td>
-                      <td>[Salary]</td>
+                      <td>{salary}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <label htmlFor="">User Name :</label>
-              <input type="text" onChange={this.onUserNameChange} />
-              <input type="button" value="Greet" onClick={this.onGreetClick} />
-              <div className="highlight">{this.state.message}</div>
+             
             </div>
           );
         }
