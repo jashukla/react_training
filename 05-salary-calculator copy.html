@@ -21,6 +21,18 @@
     <script src="react-dom.development.js"></script>
     <script src="babel.min.js"></script>
     <script type="text/babel">
+    class SalaryInput extends React.Component{
+      
+      render (){
+        const {name,onValueChange,type="number",...restProps} = this.props;
+        return(
+          <div class="field">
+                <label for="">{name} :</label>
+                <input type={type} name="" id="" onChange={evt=>onValueChange(parseInt(evt.target.value))}/>
+              </div>
+        )
+      }
+    }
       class Greeter extends React.Component {
         //state
         state = {
@@ -61,22 +73,11 @@
             <div>
               <h1>Salary Calculator</h1>
               <hr />
-              <div class="field">
-                <label for="">Basic :</label>
-                <input type="number" name="" id="" onChange={this.onBasicChange}/>
-              </div>
-              <div class="field">
-                <label for="">HRA :</label>
-                <input type="number" name="" id="" onChange={this.onHraChange}/>
-              </div>
-              <div class="field">
-                <label for="">DA :</label>
-                <input type="number" name="" id="" onChange={this.onDAChange}/>
-              </div>
-              <div class="field">
-                <label for="">Tax :</label>
-                <input type="range" name="" id="" min="0" max="30" onChange={this.onTaxChange} />
-              </div>
+              <SalaryInput name="Basic "  onValueChange={value=>this.setState({basic:value})}/>
+                <SalaryInput name="HRA " onValueChange={value=>this.setState({hra:value})}/>
+                  <SalaryInput name="DA " onValueChange={value=>this.setState({da:value})}/>
+                    <SalaryInput name="TAX " type="range" onValueChange={value=>this.setState({da:value})}/>
+             
               <div class="field">
                 <input type="button" value="Calculate" onClick={this.calculate}/>
               </div>
@@ -101,7 +102,7 @@
 
       ReactDOM.render(
         <div>
-          <Greeter />          
+          <Greeter />           
         </div>,
         document.getElementById("root")
       );
