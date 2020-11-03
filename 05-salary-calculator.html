@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Salary Calculator</title>
+    <style>
+      .field {
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+      }
+      td {
+        padding-right: 10px;
+        font-size: 18pt;
+      }
+    </style>
+    <script src="react.development.js"></script>
+    <script src="react-dom.development.js"></script>
+    <script src="babel.min.js"></script>
+    <script type="text/babel">
+      class Greeter extends React.Component {
+        //state
+        state = {
+          basic: "",
+          hra: "",
+          da: "",
+          tax: "",
+          salary : ""
+        };
+
+        //behavior
+        onBasicChange = (evt) => {
+          this.setState({ basic: evt.target.value });
+        };
+        onHraChange = (evt) => {
+          this.setState({ hra: evt.target.value });
+        };
+        onDAChange = (evt) => {
+          this.setState({ da: evt.target.value });
+        };
+        onTaxChange = (evt) => {
+          this.setState({ tax: evt.target.value });
+        };
+        onUserNameChange = (evt) => {
+          this.setState({ userName: evt.target.value });
+        };
+
+
+        calculate = () => {
+          const { basic,hra, da,tax,salary} = this.state;
+          const total = basic+hra+da;
+          const percent = (total / 100) * tax;
+          const remainig = total - percent
+          this.setState({ salary: remainig });
+        };
+
+        //presentation
+        render() {
+            const { basic,hra, da,tax,salary} = this.state;
+          return (
+            <div>
+              <h1>Salary Calculator</h1>
+              <hr />
+              <div class="field">
+                <label for="">Basic :</label>
+                <input type="number" name="" id="" onChange={this.onBasicChange}/>
+              </div>
+              <div class="field">
+                <label for="">HRA :</label>
+                <input type="number" name="" id="" onChange={this.onHraChange}/>
+              </div>
+              <div class="field">
+                <label for="">DA :</label>
+                <input type="number" name="" id="" onChange={this.onDAChange}/>
+              </div>
+              <div class="field">
+                <label for="">Tax :</label>
+                <input type="range" name="" id="" min="0" max="30" onChange={this.onTaxChange} />
+              </div>
+              <div class="field">
+                <input type="button" value="Calculate" onClick={this.calculate}/>
+              </div>
+              <div class="field">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>{basic}</td>
+                      <td>{hra}</td>
+                      <td>{da}</td>
+                      <td>{tax}</td>
+                      <td>[Salary]</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <label htmlFor="">User Name :</label>
+              <input type="text" onChange={this.onUserNameChange} />
+              <input type="button" value="Greet" onClick={this.onGreetClick} />
+              <div className="highlight">{this.state.message}</div>
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        <div>
+          <Greeter template={"Have a nice day!"} />
+          <Greeter template={"Have a good day!"} />
+        </div>,
+        document.getElementById("root")
+      );
+    </script>
+  </head>
+  <body>
+    <h1>Salary Calculator</h1>
+    <hr />
+    <div class="field">
+      <label for="">Basic :</label>
+      <input type="number" name="" id="" />
+    </div>
+    <div class="field">
+      <label for="">HRA :</label>
+      <input type="number" name="" id="" />
+    </div>
+    <div class="field">
+      <label for="">DA :</label>
+      <input type="number" name="" id="" />
+    </div>
+    <div class="field">
+      <label for="">Tax :</label>
+      <input type="range" name="" id="" min="0" max="30" />
+    </div>
+    <div class="field">
+      <input type="button" value="Calculate" />
+    </div>
+    <div class="field">
+      <table>
+        <tbody>
+          <tr>
+            <td>[Basic]</td>
+            <td>[HRA]</td>
+            <td>[DA]</td>
+            <td>[Tax]</td>
+            <td>[Salary]</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
