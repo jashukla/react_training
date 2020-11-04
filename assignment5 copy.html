@@ -9,14 +9,31 @@
     <script src="react-dom.development.js"></script>
     <script src="babel.min.js"></script>
     <script type="text/babel">
+        class MyApp extends React.Component{
+            state = {
+                count : 0
+            }
+
+            getCount = (productItems)=>{
+                this.setState({count:productItems.length})
+            }
+
+            render(){
+                return(
+                    <div>
+                        <ProductCount count={this.state.count}/>
+                        <Products updateCount={this.getCount}/>
+                    </div>
+                )
+            }
+        }
         class ProductCount extends React.Component{
             render(){
                 return(<div>
-                        {this.props.count}
+                        count : {this.props.count}
                     </div>
                     )
-            }
-            
+            }            
         }
         
         class Products extends React.Component{
@@ -28,7 +45,9 @@
             addproduct = ()=>{
                 
                 const prodN = this.inputRefProd.current.value;
-                this.setState({productNames : [prodN,...this.state.productNames]})
+                this.setState({productNames : [prodN,...this.state.productNames]},()=>{
+                    this.props.updateCount(this.state.productNames);
+                });
             }
             render(){
                 const {productNames} = this.state;
@@ -50,7 +69,7 @@
             }
         }
 
-        ReactDOM.render(<Products/>, document.getElementById('root'));
+        ReactDOM.render(<MyApp/>, document.getElementById('root'));
     </script>
 </head>
 <body>
