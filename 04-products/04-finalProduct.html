@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Products</title>
+    <style>
+        body{ 
+            margin-left: 10px;
+        }
+        section{
+            margin-bottom: 10px;
+        }
+        .field{
+            margin-bottom:10px;
+        }
+        .edit label{
+            display : block;
+        }
+        section.edit {
+            padding : 10px;
+            border : 1px solid black;
+            width : 500px;
+        }
+        ol{ 
+            width : 500px;
+            list-style: none;
+            -webkit-padding-start: 0px;
+        }
+        li{ 
+            margin-bottom: 10px;
+            padding : 10px;
+            border-radius: 5px;
+            border : 1px solid gray;
+        }
+        .name {
+            font-size: 18pt;
+            padding-bottom: 5px;
+        }
+        .price {
+            font-size: 15pt;
+            font-style: italic;
+            font-weight: bold;
+            text-align: right;
+        }
+        .outofstock {
+            color : red;
+            text-decoration: line-through;
+            font-style: italic;
+        }
+        .stats{
+            font-size: 18pt;
+        }
+    </style>
+    <!-- 
+        Use Cases :
+            (done) 1. Add products
+            (done) 2. List the added products
+            (done) 3. Toggle the 'out of stock' status of any product
+            (done) 4. Remove any product
+            (done) 5. Remove 'out of stock' products
+            (done) 6. Display the stats ( # of out of stock products / total # of products)
+            7. Persist the products in the server
+     -->
+     <script src="state-manager.js"></script>
+     <script src="react.development.js"></script>
+     <script src="react-dom.development.js"></script>
+     <script src="babel.min.js"></script>
+     <script type="text/babel">
+        class ProductItem extends React.Component{
+            render(){
+                const { product, toggleOutOfStock, removeProduct } = this.props, 
+                    { id, name, description, price, isOutOfStock } = product;
+                return(
+                    <li>
+                        <span className={'name ' + (isOutOfStock ? 'outofstock' : '')}>{name}</span>
+                        <div>{description}</div>
+                        <div className="price">Rs.{price}</div>
+                        <input type="checkbox" 
+                            checked={isOutOfStock} 
+                            onChange={ () => toggleOutOfStock(product)}
+                        />
+                        <label htmlFor="">Out of Stock</label>
+                        <br/>
+                        <input type="button" value="Remove" onClick={ () => removeProduct(product) } />
+                    </li>
+                )
+            }
+        }
+
+        class ProductsList extends React.Component {
+            render(){
+                const { products, toggleOutOfStock, removeProduct, removeOutOfStock } = this.props;
+                const productItems = products.map(product =>  (
+                        <ProductItem 
+                            key={product.id} 
+                            product={product} 
+                            toggleOutOfStock={toggleOutOfStock} 
+                            removeProduct={removeProduct} 
+                        />
+                    )
+                );
+                return(
+                    <section className="list">
+                        <ol>
+                            {productItems}
+                        </ol>
+                        <input 
+                            type="button" 
+                            value="Remove Out Of Stock" 
+                            onClick={() => removeOutOfStock(products)} 
+                        />
+                    </section>
+                )
+            }
+        }
+        class ProductEditor extends React.Component {
+            state = { 
+                name : '',
+                description : '',
+                price : 0
+            };
+
+            onAddNewProductClick = () => {
+                const { addNew } = this.props,
+                    { name, description, price } = this.state;
+                addNew(name, description, price);
+            };
+            render(){
+                console.log(this.props);
+                return(
+                    <section className="edit">
+                        <div className="field">
+                            <label htmlFor="">Name :</label>
+                            <input type="text" onChange={ evt => this.setState({ name: evt.target.value})} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="">Description :</label>
+                            <input type="text" onChange={ evt => this.setState({ description: evt.target.value})} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="">Price :</label>
+                            <input type="number" onChange={ evt => this.setState({ price: parseInt(evt.target.value) })}/>
+                        </div>
+                        <div className="field">
+                            <input type="button" value="Add Product" onClick={ this.onAddNewProductClick } />
+                        </div>
+                    </section>
+                )
+            }
+        }
+
+        class ProductStats extends React.Component {
+            render(){
+                const { products } = this.props;
+                const outOfStockCount = products.reduce((result, product) => product.isOutOfStock ? result + 1 : result, 0);
+                return(
+                     <section className="stats">
+                            <span className="outofstock">{outOfStockCount}</span>
+                            <span> / </span>
+                            <span>{products.length}</span>
+                        </section>
+                )
+            }
+        }
+        class Products extends React.Component{
+            render(){
+                const { data, toggleOutOfStock, removeProduct, removeOutOfStock, addNew } = this.props;
+                return(
+                    <div>
+                        <h3>Products</h3>
+                        <hr/>
+                        <ProductStats products={data} />                        
+                        <ProductEditor addNew={addNew} />
+                        <ProductsList
+                            products={data}
+                            toggleOutOfStock={toggleOutOfStock}
+                            removeProduct={removeProduct}
+                            removeOutOfStock={removeOutOfStock}
+                        />
+                    </div>
+                )
+            }
+        }
+
+        function productsReducer(currentState = [ ], action){
+            if (action.type === 'ADD_PRODUCT'){
+                const newState = [ ...currentState, action.payload ];
+                return newState;
+            }
+            if (action.type === 'UPDATE_PRODUCT'){
+                const updatedProduct = action.payload;
+                const newState = currentState.map(p => p.id === updatedProduct.id ? updatedProduct : p);
+                return newState;
+            }
+            if (action.type === 'REMOVE_PRODUCT'){
+                const newState = currentState.filter(p => p.id !== action.payload.id);
+                return newState;
+            }
+            if (action.type === 'REMOVE_MANY_PRODUCTS'){
+                const productsToRemove = action.payload;
+                const newState = currentState.filter(p => !productsToRemove.find(prod => prod.id === p.id));
+                return newState;
+            }
+            return currentState;
+        }
+
+        const store = StateManager.createStore(productsReducer);
+
+        let newProductId = 0;
+
+        const productActionCreators = {
+            addNew(name, description, price){
+                const newProduct = {
+                    id : ++newProductId,
+                    name : name,
+                    description : description,
+                    price : price,
+                    isOutOfStock : false
+                };
+                const action = { type : 'ADD_PRODUCT' , payload : newProduct};
+                return action;
+            },
+            toggleOutOfStock(product){
+                const updatedProduct = { ...product, isOutOfStock : !product.isOutOfStock };
+                const action = { type : 'UPDATE_PRODUCT' , payload : updatedProduct };
+                return action;
+            },
+            removeProduct(product){
+                const action = { type : 'REMOVE_PRODUCT' , payload : product};
+                return action;
+            },
+            removeOutOfStock(products /* to be fixed */){
+                const productsToRemove = products.filter(p => p.isOutOfStock);
+                const action = { type : 'REMOVE_MANY_PRODUCTS', payload : productsToRemove };
+                return action;
+            }
+        }
+
+        const productActionDispatchers = StateManager.bindActionCreators(productActionCreators, store.dispatch);
+
+        function renderApp(){
+            const products = store.getState();
+            ReactDOM.render(
+                    <Products data={products} {...productActionDispatchers} />
+                , document.getElementById('root')
+            )
+        }
+        
+        renderApp();
+        
+        store.subscribe(renderApp);
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
